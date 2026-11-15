@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chords Explorer - Project 4</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Chords Explorer - Project 4</h1>
+
+    <p>We are using data from Spotify that includes song style attributes, and chord progressions. We are interested in explorying the relationship between Chord Progressions and the types of songs they are found in. 
+        Our goal is to understand how different genres of music use chords, and how these patterns change over time. We plan to bring in a musical 'staff' that shows the different chords, that when clicked on, can then be used to filter the data.
+        When clicking a chord progression, that note will be pushed above the staff, with a scatterplot of all related songs showing from there. We may color the dots by genre, or other attributes to easily identify patterns.
+    </p>
+
+    <h2>Dataset coverage</h2>
+    <div class="chart">
+        <h3>Matched Spotify tracks by release decade</h3>
+        <iframe src="visualizations/tracks_by_decade.html" title="Matched Spotify tracks by release decade"></iframe>
+    </div>
+
+    <h2>Chord patterns</h2>
+    <div class="chart">
+        <h3>Average unique chords per year</h3>
+        <img src="visualizations/unique_chords_by_year.png" alt="Average number of unique chords in a song per year">
+    </div>
+    <div class="chart">
+        <h3>Top 15 most common chords</h3>
+        <img src="visualizations/top_common_chords.png" alt="Top 15 most common chords">
+    </div>
+    <div class="chart tall">
+        <h3>Chord distribution by tempo and genre</h3>
+        <iframe src="visualizations/density_heatmap.html" title="Chord distribution density heatmap by tempo and genre"></iframe>
+    </div>
+    <div class="chart tall">
+        <h3>Chord share by tempo and genre</h3>
+        <iframe src="visualizations/chord_tempo_scatter.html" title="Chord distribution scatter by tempo and genre"></iframe>
+    </div>
+    <div class="chart">
+        <h3>Chord diversity by main genre</h3>
+        <iframe src="visualizations/box_plot.html" title="Chord diversity by main genre"></iframe>
+    </div>
+
+    <h2>Audio features</h2>
+    <div class="chart">
+        <h3>Valence by genre and mode</h3>
+        <iframe src="visualizations/valence_by_genre_mode.html" title="Valence by genre and mode"></iframe>
+    </div>
+    <div class="chart">
+        <h3>Spotify audio profiles by main genre</h3>
+        <iframe src="visualizations/genre_audio_heatmap.html" title="Spotify audio profiles by main genre"></iframe>
+    </div>
+    <div class="chart">
+        <h3>Energy and acousticness across tracks</h3>
+        <iframe src="visualizations/energy_acousticness_scatter.html" title="Energy and acousticness across tracks"></iframe>
+    </div>
+    <div class="chart">
+        <h3>Audio feature correlations with chord diversity</h3>
+        <iframe src="visualizations/feature_correlations.html" title="Audio feature correlations with chord diversity"></iframe>
+    </div>
+    <div class="chart">
+        <h3>Spotify popularity by chord diversity</h3>
+        <iframe src="visualizations/popularity_by_diversity.html" title="Spotify popularity by chord diversity"></iframe>
+    </div>
+</body>
+</html>
