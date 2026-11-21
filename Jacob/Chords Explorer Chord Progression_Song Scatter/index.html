@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chord Progression Staff + Song Timeline</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://d3js.org/d3.v7.min.js" defer></script>
+  <script src="staff.js" defer></script>
+  <script src="scatter.js" defer></script>
+</head>
+<body>
+  <main class="page">
+    <p class="eyebrow">Chordonomicon + Spotify</p>
+    <h1>Which songs use this chord progression?</h1>
+    <p class="description">
+      Click chords on the staff: each one lifts above the staff and joins your progression (up to 4, in order).
+      The songs that play those chords back to back, in that order, pop up on the timeline below. The staff glows on the chords that most often come next.
+    </p>
+
+    <section class="card">
+      <svg id="staff" width="100%" viewBox="0 0 1040 270"></svg>
+      <button id="undo" type="button">Undo</button> <button id="clear" type="button">Clear</button>
+      <span id="hint" class="hint">Filled note = major chord, hollow = minor.</span>
+    </section>
+
+    <section class="card chart-wrap">
+      <div id="summary" class="summary">Loading songs…</div>
+      <div class="search">
+        <input id="q-artist" type="search" placeholder="Highlight artists…" autocomplete="off">
+        <input id="q-song" type="search" placeholder="Highlight songs…" autocomplete="off">
+      </div>
+      <div id="legend" class="legend" role="group" aria-label="Genre legend"></div>
+      <div id="loader" class="loader" hidden>
+        <p id="loader-msg"></p>
+        <label class="picker">Load <code>chordonomicon_spotifydump_join.csv.gz</code> manually
+          <input id="file" type="file" accept=".gz,.csv"></label>
+      </div>
+      <div id="chart" class="chart">
+        <canvas id="dots"></canvas>
+        <svg id="axes"></svg>
+        <div id="empty" class="empty"></div>
+        <div id="tooltip" class="tooltip" hidden></div>
+      </div>
+    </section>
+    <p class="foot">
+      Data is read straight from <code>chordonomicon_spotifydump_join.csv.gz</code> in the Chords-Explorer folder (decompressed in your browser).
+      The staff shows the 16 chords found in the most songs. Seventh, slash and other extended chords count as their plain major or minor chord, and
+      repeated chords in a row count once, so G–D means G followed directly by D. Each dot is one song, placed by release date, sized by Spotify popularity
+      and colored by main genre; vertical position is random. Songs with no release date or from before 1950 are left out.
+    </p>
+  </main>
+</body>
+</html>
