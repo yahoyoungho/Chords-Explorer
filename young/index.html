@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f3f6f8">
+    <title>Chromatic Scale on a Treble Staff</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://d3js.org/d3.v7.min.js" defer></script>
+    <script src="music.js" defer></script>
+</head>
+<body>
+    <main class="page">
+        <section class="scale-card" aria-labelledby="page-title">
+            <p class="eyebrow">C4–B4 · twelve notes</p>
+            <h1 id="page-title">Chromatic Scale</h1>
+            <p class="description">
+                Click notes on the lower staff to build a chord on the upper staff.
+                The names below are chords contained in those notes, rooted on the lowest one.
+            </p>
+            <div
+                id="chromatic-staff"
+                class="staff-container"
+                role="group"
+                aria-label="Interactive chromatic scale and chord staff"
+            ></div>
+            <p id="interaction-status" class="interaction-status" aria-live="polite">
+                Click a note on the lower staff to move it to the upper staff.
+            </p>
+            <div id="chord-results" class="chord-results" hidden>
+                <h2 id="chord-results-heading" class="chord-results-heading">Contained chords</h2>
+                <ul id="chord-list" class="chord-list" aria-live="polite" aria-labelledby="chord-results-heading"></ul>
+                <p id="chord-empty" class="chord-empty" hidden></p>
+            </div>
+            <p class="notation-note">
+                C4 is shown on a ledger line below the staff. Natural signs cancel
+                the preceding flats within the measure.
+            </p>
+        </section>
+    </main>
+</body>
+</html>
