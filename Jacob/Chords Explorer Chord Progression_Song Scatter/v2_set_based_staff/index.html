@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chord Staff + Song Timeline</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://d3js.org/d3.v7.min.js" defer></script>
+  <script src="staff.js" defer></script>
+  <script src="scatter.js" defer></script>
+</head>
+<body>
+  <main class="page">
+    <p class="eyebrow">Chordonomicon + Spotify</p>
+    <h1>Which songs use these chords?</h1>
+    <p class="description">
+      Pull base chords up from the lower staff to the upper staff. The songs that use <em>all</em> of them pop up on the timeline below;
+      until you pick a chord it stays empty, and the genre buttons narrow it to one genre. A base chord is the chord's root, so C covers C, Cmaj7, C/E and so on.
+    </p>
+
+    <section class="card">
+      <div id="chromatic-staff" class="staff-container" role="group" aria-label="Interactive chord staff"></div>
+      <p id="interaction-status" class="interaction-status" aria-live="polite">Click a note on the lower staff to move it to the upper staff.</p>
+    </section>
+
+    <section class="card chart-wrap">
+      <div id="summary" class="summary">Loading songs…</div>
+      <div class="search">
+        <input id="q-artist" type="search" placeholder="Highlight artists…" autocomplete="off">
+        <input id="q-song" type="search" placeholder="Highlight songs…" autocomplete="off">
+      </div>
+      <div id="legend" class="legend" role="group" aria-label="Genre legend"></div>
+      <div id="loader" class="loader" hidden>
+        <p id="loader-msg"></p>
+        <label class="picker">Load <code>chordonomicon_spotifydump_join.csv.gz</code> manually
+          <input id="file" type="file" accept=".gz,.csv"></label>
+      </div>
+      <div id="chart" class="chart">
+        <canvas id="dots"></canvas>
+        <svg id="axes"></svg>
+        <div id="empty" class="empty"></div>
+        <div id="tooltip" class="tooltip" hidden></div>
+      </div>
+    </section>
+    <p class="foot">
+      Data is read straight from <code>chordonomicon_spotifydump_join.csv.gz</code> in the Chords-Explorer folder (decompressed in your browser).
+      Each dot is one song, placed by release date, sized by Spotify popularity and colored by main genre; vertical position is random.
+      Sharps and flats are merged (F♯ = G♭), seventh and slash chords count as their root, songs without a release date or from before 1950 are left out.
+    </p>
+  </main>
+</body>
+</html>

@@ -1,13 +1,14 @@
 // Song timeline driven by the chord-progression staff. Reads Chords-Explorer/chordonomicon_spotifydump_join.csv.gz in the browser.
 const CSV_URL = "../../chordonomicon_spotifydump_join.csv.gz";   // Chords-Explorer/chordonomicon_spotifydump_join.csv.gz
-const X_MIN = 1950, X_MAX = 2022, PAL_SIZE = 16;
+const X_MIN = 1950, X_MAX = 2022;
 const COLORS = ["#9aa5ad", "#e15759", "#4e79a7", "#f28e2b", "#b07aa1", "#59a14f", "#edc948", "#76b7b2", "#ff9da7", "#9c755f", "#17becf", "#bab0ac", "#7f3c8d"];
 const margin = { top: 8, right: 16, bottom: 34, left: 16 };
 const canvas = document.getElementById("dots"), ctx = canvas.getContext("2d");
 const axes = d3.select("#axes"), tooltip = d3.select("#tooltip");
-const CH = i => String.fromCharCode(65 + i);   // palette index -> one character, so a progression is a substring of the song's chord string
+const CH = i => String.fromCharCode(65 + i);   // chord index (pitch class x major/minor, 0-23) -> one character, so a progression is a substring of the song's chord string
+const PC = { C: 0, Cs: 1, Db: 1, D: 2, Ds: 3, Eb: 3, E: 4, Fb: 4, Es: 5, F: 5, Fs: 6, Gb: 6, G: 7, Gs: 8, Ab: 8, A: 9, As: 10, Bb: 10, B: 11, Cb: 11, Bs: 0 };   // F# and Gb are the same chord
 
-let items = [], GENRES = [], PAL = [], color = () => "#999", dots = [], quad = null, W = 0, H = 0;
+let items = [], GENRES = [], color = () => "#999", dots = [], quad = null, W = 0, H = 0;
 let selected = null, qArtist = "", qSong = "", prog = [], progStr = "", match = null, popTimer = null;
 
 // ---------- streaming CSV reader ----------
@@ -37,22 +38,19 @@ function csvParser(onRow) {
   };
 }
 
-// Plain major/minor chord name, e.g. "Amin7" -> "Amin", "A/Cs" -> "A", "Fsmaj7" -> "Fs"
-const chordRx = /^([A-G][sb]?)([^/]*)/;
+// Chord -> 0..23 = pitch class x major/minor. "Amin7" -> A minor, "A/Cs" -> A, "Fsmaj7" -> F#, "Fsus4" -> F (the "s" in sus is not a sharp)
+const chordRx = /^([A-G](?:s(?!us)|b)?)([^/]*)/;
 async function readSongs(stream, gz, progress) {
   let text = stream;
   if (gz) text = text.pipeThrough(new DecompressionStream("gzip"));
   const reader = text.pipeThrough(new TextDecoderStream()).getReader();
   let col = null, count = 0;
-  const seen = new Set(), out = [], tokId = new Map(), names = [], nameId = new Map(), cover = [], lastSong = [];
+  const seen = new Set(), out = [], tokId = new Map();
   const idOf = t => {
     let v = tokId.get(t);
     if (v === undefined) {
       const m = t[0] === "<" ? null : chordRx.exec(t);
-      if (!m) v = -1; else {
-        const q = m[2], name = m[1] + (q.startsWith("min") || (q.startsWith("m") && !q.startsWith("maj")) ? "min" : "");
-        v = nameId.get(name); if (v === undefined) { v = names.length; names.push(name); nameId.set(name, v); cover.push(0); lastSong.push(-1); }
-      }
+      if (!m || PC[m[1]] === undefined) v = -1; else { const q = m[2]; v = PC[m[1]] * 2 + (q.startsWith("min") || (q.startsWith("m") && !q.startsWith("maj")) ? 1 : 0); }
       tokId.set(t, v);
     }
     return v;
@@ -64,31 +62,26 @@ async function readSongs(stream, gz, progress) {
     const d = /^(\d{4})-(\d\d)-(\d\d)/.exec(r[col.release_date]); if (!d) return;
     const year = +d[1] + (Date.UTC(+d[1], +d[2] - 1, +d[3]) - Date.UTC(+d[1], 0, 1)) / 86400000 / 365.25;
     if (year < X_MIN) return;
-    const ids = []; let last = -2;
-    for (const t of r[col.chords].split(" ")) { const v = idOf(t); if (v < 0 || v === last) continue; ids.push(v); last = v; }
-    if (ids.length < 2) return;
-    const si = out.length;
-    for (const v of ids) if (lastSong[v] !== si) { lastSong[v] = si; cover[v]++; }
-    out.push({ year, g: r[col.main_genre] || "unlabeled", ids, title: r[col.track], artist: r[col.artist], pop: +r[col.popularity] || 0 });
+    let seq = "", last = -2;
+    for (const t of r[col.chords].split(" ")) { const v = idOf(t); if (v < 0 || v === last) continue; seq += CH(v); last = v; }   // repeats collapse
+    if (seq.length < 2) return;
+    out.push({ year, g: r[col.main_genre] || "unlabeled", seq, title: r[col.track], artist: r[col.artist], pop: +r[col.popularity] || 0 });
   });
   for (;;) { const { done, value } = await reader.read(); if (done) break; parse(value); progress(count); }
-  // palette = the chords found in the most songs; every song becomes a string of palette letters ("." = a chord outside the palette)
-  const top = names.map((n, i) => i).sort((a, b) => cover[b] - cover[a]).slice(0, PAL_SIZE), idx = new Map(top.map((v, i) => [v, i]));
-  for (const s of out) { s.seq = s.ids.map(v => idx.has(v) ? CH(idx.get(v)) : ".").join(""); delete s.ids; }
-  return { songs: out, pal: top.map(v => names[v]) };
+  return { songs: out };
 }
 
 // ---------- matching ----------
 function recomputeMatches() {
-  progStr = prog.map(c => CH(PAL.indexOf(c))).join("");
+  progStr = prog.map(c => CH(ChordStaff.idx(c))).join("");
   match = new Uint8Array(items.length);
   if (progStr) for (let i = 0; i < items.length; i++) match[i] = items[i].seq.includes(progStr) ? 1 : 0;
 }
 // share of matching songs in which each palette chord directly follows the progression
 function nextShares() {
   const n = d3.sum(match); if (!n || prog.length >= 4) return null;
-  const f = new Map();
-  PAL.forEach((c, k) => { const s = progStr + CH(k); let m = 0; for (let i = 0; i < items.length; i++) if (match[i] && items[i].seq.includes(s)) m++; f.set(c, m / n); });
+  const f = new Array(24).fill(0);
+  for (let k = 0; k < 24; k++) { const t = progStr + CH(k); let m = 0; for (let i = 0; i < items.length; i++) if (match[i] && items[i].seq.includes(t)) m++; f[k] = m / n; }
   return f;
 }
 
@@ -110,7 +103,7 @@ function layout() {
 }
 const searching = () => qArtist !== "" || qSong !== "";
 const hit = d => (!qArtist || d.la.includes(qArtist)) && (!qSong || d.lt.includes(qSong));
-let groups = [], visibleCount = 0;
+let groups = [], visibleCount = 0, boost = 1;
 function regroup() {
   groups = GENRES.map(() => ({ dim: [], hl: [] })); visibleCount = 0;
   for (const p of dots) {
@@ -118,6 +111,7 @@ function regroup() {
     if (!p.vis) continue;
     visibleCount++; groups[p.d.g][searching() && !hit(p.d) ? "dim" : "hl"].push(p);
   }
+  boost = Math.min(4, Math.max(1, Math.pow(30000 / Math.max(visibleCount, 1), 0.35)));   // fewer songs on screen -> bigger dots
   const e = d3.select("#empty");
   if (!prog.length) e.attr("hidden", null).text("Click chords on the staff and the songs that play them in that order will appear here.");
   else if (!visibleCount) e.attr("hidden", null).text("No songs play these chords in this order" + (selected !== null ? " in this genre." : "."));
@@ -126,13 +120,13 @@ function regroup() {
 function paintGroup(list, fill, alpha, extra, k) {
   if (!list.length) return;
   ctx.fillStyle = fill; ctx.globalAlpha = alpha; ctx.beginPath();
-  for (const p of list) { const r = (0.9 + (p.d.pop / 100) * 1.7 + extra) * k; ctx.moveTo(p.px + r, p.py); ctx.arc(p.px, p.py, r, 0, 6.2832); }
+  for (const p of list) { const r = (0.9 + (p.d.pop / 100) * 1.7 + extra) * k * boost; ctx.moveTo(p.px + r, p.py); ctx.arc(p.px, p.py, r, 0, 6.2832); }
   ctx.fill();
 }
 function draw(t = 1) {
   ctx.clearRect(0, 0, W, H);
   const k = d3.easeBackOut.overshoot(1.6)(t), fade = Math.min(1, t * 2), s = searching();
-  groups.forEach((g, i) => { paintGroup(g.dim, color(GENRES[i]), 0.1 * fade, 0, k); paintGroup(g.hl, color(GENRES[i]), (s ? 0.9 : 0.55) * fade, s ? 0.5 : 0, k); });
+  groups.forEach((g, i) => { paintGroup(g.dim, color(GENRES[i]), 0.1 * fade, 0, k); paintGroup(g.hl, color(GENRES[i]), (s ? 0.9 : boost > 1.5 ? 0.75 : 0.55) * fade, s ? 0.5 : 0, k); });
   ctx.globalAlpha = 1;
 }
 function refresh(animate) {
@@ -189,14 +183,14 @@ const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;",
 let timer; window.addEventListener("resize", () => { clearTimeout(timer); timer = setTimeout(() => items.length && layout(), 120); });
 
 // ---------- boot ----------
-function start({ songs, pal }) {
+function start({ songs }) {
   const counts = d3.rollup(songs, v => v.length, d => d.g);
   GENRES = [...counts.keys()].sort((a, b) => counts.get(b) - counts.get(a));
   color = d3.scaleOrdinal().domain(GENRES).range(COLORS);
   items = songs.map((d, i) => Object.assign(d, { g: GENRES.indexOf(d.g), j: hash(i, 12.9898, 78.233), j2: hash(i, 39.3467, 11.135), lt: d.title.toLowerCase(), la: d.artist.toLowerCase() }));
-  PAL = pal; match = new Uint8Array(items.length);
+  match = new Uint8Array(items.length);
   d3.select("#loader").attr("hidden", true);
-  ChordStaff.init(pal); buildLegend(); layout();
+  buildLegend(); ChordStaff.init(); layout();
 }
 async function load(getStream, gz) {
   const msg = d3.select("#summary");
