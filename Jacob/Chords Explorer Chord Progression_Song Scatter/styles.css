@@ -39,3 +39,8 @@ code { background: #eef2f5; padding: 1px 5px; border-radius: 4px; font-size: .85
 .empty { position: absolute; inset: 0 0 34px 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 24px; color: #7b8d98; font-size: 1rem; pointer-events: none; }
 .empty[hidden] { display: none; }
 .legend button.is-empty { opacity: .45; }
+
+.note.is-selected .head { stroke: #c2410c; stroke-width: 3.5; }
+.note:focus-visible .head, .acc-btn:focus-visible rect { stroke: #c2410c; stroke-width: 3; outline: none; }
+.acc-btn:hover rect { fill: #fde7da; stroke: #c2410c; }
+.popup text { font-family: inherit; }
