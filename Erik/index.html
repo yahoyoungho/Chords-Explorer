@@ -12,10 +12,11 @@
 <body>
     <main class="page">
         <section class="scale-card" aria-labelledby="page-title">
-            <p class="eyebrow">C4–B4 · twelve notes</p>
-            <h1 id="page-title">Chromatic Scale</h1>
+            <h1 id="page-title">Chords Explorer</h1>
             <p class="description">
-                Click notes on the lower staff to build a chord on the upper staff.
+                Click notes on the staff below to see information about songs (from 1900-2023) that use chords rooted on the note(s) selected from the staff below.
+                i.e. Selecting notes E and G would show the info of songs that use any E <u>and</u> G chords.
+                For fun, if your selection of notes forms a chord or chords, we will display the associated chord name(s). i.e. Selecting notes C-E-G-B will display chords Cmaj7 and C (Major).
             </p>
             <div
                 id="chromatic-staff"
@@ -24,11 +25,15 @@
                 aria-label="Interactive chromatic scale and chord staff"
             ></div>
             <p id="interaction-status" class="interaction-status" aria-live="polite">
-                Click a note on the lower staff to move it to the upper staff.
+                Click a note on the lower staff, then choose ♭, ♮, or #.
             </p>
+            <div id="chord-results" class="chord-results" hidden>
+                <h2 id="chord-results-heading" class="chord-results-heading">Contained chords</h2>
+                <ul id="chord-list" class="chord-list" aria-live="polite" aria-labelledby="chord-results-heading"></ul>
+                <p id="chord-empty" class="chord-empty" hidden></p>
+            </div>
             <p class="notation-note">
-                C4 is shown on a ledger line below the staff. Natural signs cancel
-                the preceding flats within the measure.
+                Natural signs (♮) cancel the preceding flats within the measure.
             </p>
         </section>
     </main>

@@ -36,15 +36,6 @@ body {
     box-shadow: 0 18px 50px rgb(34 55 70 / 9%);
 }
 
-.eyebrow {
-    margin: 0 0 8px;
-    color: #547487;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-}
-
 h1 {
     margin: 0;
     color: #172a38;
@@ -98,6 +89,20 @@ h1 {
     font-size: 24px;
 }
 
+.accidental-option {
+    fill: #203b4d;
+    font-family: "Noto Music", "Segoe UI Symbol", "Apple Symbols", serif;
+    font-size: 24px;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+}
+
+.accidental-option:hover,
+.accidental-option:focus {
+    fill: #bf6a35;
+}
+
 .note-label {
     fill: #425d6c;
     font-size: 14px;
@@ -118,7 +123,8 @@ h1 {
     fill: #bf6a35;
 }
 
-.note.is-selected .note-stem {
+.note.is-selected .note-stem,
+.chord-stem {
     stroke: #bf6a35;
 }
 
@@ -126,6 +132,49 @@ h1 {
     min-height: 1.5em;
     margin: 8px 0 0;
     color: #547487;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.chord-results {
+    margin-top: 18px;
+}
+
+.chord-results-heading {
+    margin: 0 0 10px;
+    color: #172a38;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.chord-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-height: 240px;
+    margin: 0;
+    padding: 2px;
+    overflow: auto;
+    list-style: none;
+}
+
+.chord-chip {
+    padding: 6px 10px;
+    color: #172a38;
+    background: #f3f6f8;
+    border: 1px solid #e1e8ed;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.chord-empty {
+    margin: 0;
+    color: #61727e;
     font-size: 0.9rem;
     line-height: 1.5;
 }
