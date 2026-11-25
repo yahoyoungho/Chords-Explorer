@@ -1,42 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#f3f6f8">
-    <title>Chromatic Scale on a Treble Staff</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://d3js.org/d3.v7.min.js" defer></script>
-    <script src="music.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chord Progression Staff + Popular Songs</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://d3js.org/d3.v7.min.js" defer></script>
+  <script src="staff.js" defer></script>
+  <script src="scatter.js" defer></script>
 </head>
 <body>
-    <main class="page">
-        <section class="scale-card" aria-labelledby="page-title">
-            <p class="eyebrow">C4–B4 · twelve notes</p>
-            <h1 id="page-title">Chromatic Scale</h1>
-            <p class="description">
-                Click notes on the lower staff to build a chord on the upper staff.
-                The names below are chords contained in those notes, rooted on the lowest one.
-            </p>
-            <div
-                id="chromatic-staff"
-                class="staff-container"
-                role="group"
-                aria-label="Interactive chromatic scale and chord staff"
-            ></div>
-            <p id="interaction-status" class="interaction-status" aria-live="polite">
-                Click a note on the lower staff to move it to the upper staff.
-            </p>
-            <div id="chord-results" class="chord-results" hidden>
-                <h2 id="chord-results-heading" class="chord-results-heading">Contained chords</h2>
-                <ul id="chord-list" class="chord-list" aria-live="polite" aria-labelledby="chord-results-heading"></ul>
-                <p id="chord-empty" class="chord-empty" hidden></p>
-            </div>
-            <p class="notation-note">
-                C4 is shown on a ledger line below the staff. Natural signs cancel
-                the preceding flats within the measure.
-            </p>
-        </section>
-    </main>
+  <main class="page">
+    <p class="eyebrow">Chordonomicon + Spotify</p>
+    <h1>Most popular songs for this chord progression</h1>
+    <p class="description">
+      Pick a note and a ♭, ♮ or ♯ from the dropdowns (or click a note on the staff), choose major or minor, and the chord lifts above the staff to join your progression (up to 4, in order).
+      Every song that plays those chords back to back, in that order, appears on the timeline. The most popular song in each genre is outlined and labeled; select a genre to outline and label its top 5. Under each note the staff shows the chord that most often comes next.
+    </p>
+
+    <section class="card">
+      <svg id="staff" width="100%" viewBox="0 0 1040 270"></svg>
+      <div class="picker-row">
+        <label>Note <select id="sel-note" aria-label="Note"></select></label>
+        <label>Accidental <select id="sel-acc" aria-label="Flat, natural or sharp" disabled></select></label>
+        <label>Quality <select id="sel-qual" aria-label="Major or minor"><option value="maj">Major</option><option value="min">Minor</option></select></label>
+        <span class="picker-hint">Pick a note, then an accidental to add the chord (or click a note on the staff).</span>
+      </div>
+      <button id="undo" type="button">Undo</button> <button id="clear" type="button">Clear</button>
+      <span id="hint" class="hint"></span>
+    </section>
+
+    <section class="card chart-wrap">
+      <div id="summary" class="summary">Loading songs…</div>
+      <div class="search">
+        <input id="q-artist" type="search" placeholder="Highlight artists…" autocomplete="off">
+        <input id="q-song" type="search" placeholder="Highlight songs…" autocomplete="off">
+      </div>
+      <div id="legend" class="legend" role="group" aria-label="Genre legend"></div>
+      <div id="loader" class="loader" hidden>
+        <p id="loader-msg"></p>
+        <label class="picker">Load <code>chordonomicon_transformed.csv.gz</code> manually
+          <input id="file" type="file" accept=".gz,.csv"></label>
+      </div>
+      <div id="chart" class="chart">
+        <canvas id="dots"></canvas>
+        <svg id="axes"></svg>
+        <svg id="labels"></svg>
+        <div id="empty" class="empty"></div>
+        <div id="tooltip" class="tooltip" hidden></div>
+      </div>
+    </section>
+    <p class="foot">
+      Data is read straight from <code>Erik/chordonomicon_transformed.csv.gz</code> in the Chords-Explorer folder (decompressed in your browser).
+      Seventh, slash, suspended and other extended chords count as their plain major or minor chord; sharps and flats are the same chord (F♯ = G♭); and
+      repeated chords in a row count once, so G–D means G followed directly by D. Each dot is one song, placed by release date, sized by Spotify popularity
+      and colored by main genre; vertical position is random. The year axis tightens to the songs on the chart, rounded outward (a genre that starts in the mid-1980s begins near 1980). The most popular song in each genre is drawn with a large border and a label (title, artist, year, popularity); selecting a genre outlines and labels its top 5. Labels move aside when they would cover one another.
+      Songs with no release date or from before 1950 are left out.
+    </p>
+  </main>
 </body>
 </html>
