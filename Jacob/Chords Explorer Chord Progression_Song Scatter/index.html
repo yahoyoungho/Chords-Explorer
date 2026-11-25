@@ -14,18 +14,12 @@
     <p class="eyebrow">Chordonomicon + Spotify</p>
     <h1>Which songs use this chord progression?</h1>
     <p class="description">
-      Pick a note and a ♭, ♮ or ♯ from the dropdowns (or click a note on the staff), choose major or minor, and the chord lifts above the staff to join your progression (up to 4, in order).
+      Click a note on the staff, choose ♭, ♮ or ♯ (and major or minor), and the chord lifts above the staff to join your progression (up to 4, in order).
       The songs that play those chords back to back, in that order, pop up on the timeline below. Under each note the staff shows the chord that most often comes next.
     </p>
 
     <section class="card">
-      <svg id="staff" width="100%" viewBox="0 0 1040 270"></svg>
-      <div class="picker-row">
-        <label>Note <select id="sel-note" aria-label="Note"></select></label>
-        <label>Accidental <select id="sel-acc" aria-label="Flat, natural or sharp" disabled></select></label>
-        <label>Quality <select id="sel-qual" aria-label="Major or minor"><option value="maj">Major</option><option value="min">Minor</option></select></label>
-        <span class="picker-hint">Pick a note, then an accidental to add the chord (or click a note on the staff).</span>
-      </div>
+      <svg id="staff" width="100%" viewBox="0 0 1040 290"></svg>
       <button id="undo" type="button">Undo</button> <button id="clear" type="button">Clear</button>
       <span id="hint" class="hint"></span>
     </section>

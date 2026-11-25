@@ -11,7 +11,7 @@ const ChordStaff = (() => {
   const yb = 215, half = 10, stepY = s => yb - (s - 2) * half, LANE_Y = 52, laneX = i => 200 + i * 150, MAX = 4;
   let prog = [], lane, arrows, nodes, popup, xs, minor = false, openLetter = null, staff;
   const hint = t => d3.select("#hint").text(t);
-  const DEFAULT_HINT = "Use the dropdowns or click a note. Filled note = major chord, hollow = minor.";
+  const DEFAULT_HINT = "Click a note, then choose ♭, ♮ or ♯ and major or minor. Filled note = major chord, hollow = minor.";
 
   function drawNote(sel, step, acc, min, cx, cy, stemUp) {
     if (step === 0 && cy >= stepY(0) - 1) sel.append("line").attr("x1", cx - 16).attr("x2", cx + 16).attr("y1", cy).attr("y2", cy).attr("stroke", "#444");
@@ -35,19 +35,19 @@ const ChordStaff = (() => {
       const n = d3.select(this), cx = xs(l), cy = stepY(STEP[l]);
       n.append("rect").attr("x", cx - 24).attr("y", cy - 44).attr("width", 48).attr("height", 100).attr("fill", "transparent");   // bigger click target
       drawNote(n, STEP[l], "", false, cx, cy, STEP[l] < 4);
-      n.append("text").attr("x", cx).attr("y", yb + 38).attr("text-anchor", "middle").attr("font-weight", 700).text(l);
-      n.append("text").attr("class", "nxt").attr("x", cx).attr("y", yb + 54).attr("text-anchor", "middle").attr("font-size", 11).attr("fill", "#c2410c");
+      n.append("text").attr("x", cx).attr("y", yb + 52).attr("text-anchor", "middle").attr("font-weight", 700).text(l);
+      n.append("text").attr("class", "nxt").attr("x", cx).attr("y", yb + 68).attr("text-anchor", "middle").attr("font-size", 11).attr("fill", "#c2410c");
     });
     popup = staff.append("g").attr("class", "popup").attr("hidden", true).style("display", "none");
     staff.on("click", () => closePopup());
     document.addEventListener("keydown", e => { if (e.key === "Escape") closePopup(); });
     d3.select("#undo").on("click", () => pop()); d3.select("#clear").on("click", () => { while (prog.length) pop(true); emit(); });
-    hint(DEFAULT_HINT); wireSelects(); emit();
+    hint(DEFAULT_HINT); emit();
   }
 
   // ---- the ♭ ♮ ♯ chooser ----
   function toggle(l) { openLetter === l ? closePopup() : openPopup(l); }
-  function closePopup(keepSel) { openLetter = null; popup.style("display", "none"); if (keepSel !== true) nodes.classed("is-selected", false); hint(DEFAULT_HINT); }
+  function closePopup() { openLetter = null; popup.style("display", "none"); nodes.classed("is-selected", false); hint(DEFAULT_HINT); }
   function openPopup(l) {
     openLetter = l; nodes.classed("is-selected", d => d === l);
     hint(`Choose ♭, ♮ or ♯ for ${l}, major or minor.`);
@@ -66,7 +66,7 @@ const ChordStaff = (() => {
     });
     [["major", false], ["minor", true]].forEach(([t, m], i) => {
       const g = popup.append("g").attr("class", "q-btn").attr("data-q", m ? "min" : "maj").style("cursor", "pointer")
-        .on("click", e => { e.stopPropagation(); minor = m; d3.select("#sel-qual").property("value", m ? "min" : "maj"); popup.selectAll(".q-btn rect").attr("fill", (d, j, a) => a[j].parentNode.getAttribute("data-q") === (minor ? "min" : "maj") ? "#1d2330" : "#fff");
+        .on("click", e => { e.stopPropagation(); minor = m; popup.selectAll(".q-btn rect").attr("fill", (d, j, a) => a[j].parentNode.getAttribute("data-q") === (minor ? "min" : "maj") ? "#1d2330" : "#fff");
           popup.selectAll(".q-btn text").attr("fill", (d, j, a) => a[j].parentNode.getAttribute("data-q") === (minor ? "min" : "maj") ? "#fff" : "#1d2330"); });
       const bx = px + 10 + i * 81;
       g.append("rect").attr("x", bx).attr("y", py + 66).attr("width", 75).attr("height", 20).attr("rx", 10).attr("stroke", "#1d2330").attr("fill", m === minor ? "#1d2330" : "#fff");
@@ -74,28 +74,9 @@ const ChordStaff = (() => {
     });
   }
 
-  // ---- dropdown controls: pick a note, then an accidental ----
-  // Choosing an accidental adds the chord, then both menus reset (so the same chord can be added twice in a row).
-  function wireSelects() {
-    const noteSel = d3.select("#sel-note"), accSel = d3.select("#sel-acc"), qualSel = d3.select("#sel-qual");
-    noteSel.html("").selectAll("option").data([{ v: "", t: "Note…" }, ...LETTERS.map(l => ({ v: l, t: l }))]).join("option").attr("value", d => d.v).text(d => d.t);
-    accSel.html("").selectAll("option").data([{ v: "-", t: "♭ / ♮ / ♯ …" }, ...ACCS.map(a => ({ v: a.val || "n", t: `${a.sym} ${a.val === "b" ? "flat" : a.val === "s" ? "sharp" : "natural"}` }))]).join("option").attr("value", d => d.v).text(d => d.t);
-    const sync = () => { const l = noteSel.property("value"); accSel.property("disabled", !l); nodes.classed("is-selected", d => d === l); if (l) { closePopup(true); nodes.classed("is-selected", d => d === l); } };
-    noteSel.on("change", sync);
-    qualSel.on("change", () => { minor = qualSel.property("value") === "min"; });
-    accSel.on("change", () => {
-      const l = noteSel.property("value"), v = accSel.property("value");
-      if (!l || v === "-") return;
-      add(l, ACCS.find(a => (a.val || "n") === v));
-      noteSel.property("value", ""); accSel.property("value", "-"); sync();
-    });
-    sync();
-  }
-
   // ---- progression lane ----
   function add(letter, a) {
     if (prog.length >= MAX) { closePopup(); return; }
-    minor = d3.select("#sel-qual").property("value") === "min";
     const c = { letter, acc: a.val, min: minor, pc: (NAT_PC[letter] + a.d + 12) % 12 };
     const i = prog.length; prog.push(c); closePopup();
     // the chord is copied from its place on the staff and lifted above the staff into the progression lane
