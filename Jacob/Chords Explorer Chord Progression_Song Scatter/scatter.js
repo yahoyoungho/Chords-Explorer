@@ -1,12 +1,12 @@
-// Song timeline driven by the chord-progression staff. Reads Chords-Explorer/chordonomicon_spotifydump_join.csv.gz in the browser.
-const CSV_URL = "../../chordonomicon_spotifydump_join.csv.gz";   // Chords-Explorer/chordonomicon_spotifydump_join.csv.gz
+// Song timeline driven by the chord-progression staff. Reads Erik's cleaned Chords-Explorer/Erik/chordonomicon_transformed.csv.gz in the browser.
+const CSV_URL = "../../Erik/chordonomicon_transformed.csv.gz";   // Chords-Explorer/Erik/chordonomicon_transformed.csv.gz (sharps written "#")
 const X_MIN = 1950, X_MAX = 2022;
 const COLORS = ["#9aa5ad", "#e15759", "#4e79a7", "#f28e2b", "#b07aa1", "#59a14f", "#edc948", "#76b7b2", "#ff9da7", "#9c755f", "#17becf", "#bab0ac", "#7f3c8d"];
 const margin = { top: 8, right: 16, bottom: 34, left: 16 };
 const canvas = document.getElementById("dots"), ctx = canvas.getContext("2d");
 const axes = d3.select("#axes"), tooltip = d3.select("#tooltip");
 const CH = i => String.fromCharCode(65 + i);   // chord index (pitch class x major/minor, 0-23) -> one character, so a progression is a substring of the song's chord string
-const PC = { C: 0, Cs: 1, Db: 1, D: 2, Ds: 3, Eb: 3, E: 4, Fb: 4, Es: 5, F: 5, Fs: 6, Gb: 6, G: 7, Gs: 8, Ab: 8, A: 9, As: 10, Bb: 10, B: 11, Cb: 11, Bs: 0 };   // F# and Gb are the same chord
+const PC = { "C#": 1, "D#": 3, "E#": 5, "F#": 6, "G#": 8, "A#": 10, "B#": 0, C: 0, Cs: 1, Db: 1, D: 2, Ds: 3, Eb: 3, E: 4, Fb: 4, Es: 5, F: 5, Fs: 6, Gb: 6, G: 7, Gs: 8, Ab: 8, A: 9, As: 10, Bb: 10, B: 11, Cb: 11, Bs: 0 };   // F# and Gb are the same chord
 
 let items = [], GENRES = [], color = () => "#999", dots = [], quad = null, W = 0, H = 0;
 let selected = null, qArtist = "", qSong = "", prog = [], progStr = "", match = null, popTimer = null;
@@ -39,7 +39,7 @@ function csvParser(onRow) {
 }
 
 // Chord -> 0..23 = pitch class x major/minor. "Amin7" -> A minor, "A/Cs" -> A, "Fsmaj7" -> F#, "Fsus4" -> F (the "s" in sus is not a sharp)
-const chordRx = /^([A-G](?:s(?!us)|b)?)([^/]*)/;
+const chordRx = /^([A-G](?:#|s(?!us)|b)?)([^/]*)/;
 async function readSongs(stream, gz, progress) {
   let text = stream;
   if (gz) text = text.pipeThrough(new DecompressionStream("gzip"));
