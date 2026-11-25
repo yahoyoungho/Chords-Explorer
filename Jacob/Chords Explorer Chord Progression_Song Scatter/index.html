@@ -8,22 +8,48 @@
   <script src="https://d3js.org/d3.v7.min.js" defer></script>
   <script src="staff.js" defer></script>
   <script src="scatter.js" defer></script>
+  <script src="demo.js" defer></script>
+  <script src="nudge.js" defer></script>
 </head>
 <body>
   <main class="page">
-    <p class="eyebrow">Chordonomicon + Spotify</p>
-    <h1>Which songs use this chord progression?</h1>
-    <p class="description">
-      Click a note on the staff, choose ♭, ♮ or ♯ (and major or minor), and the chord lifts above the staff to join your progression (up to 4, in order).
-      The songs that play those chords back to back, in that order, pop up on the timeline below. Under each note the staff shows the chord that most often comes next.
-    </p>
+    <header class="hero">
+      <p class="eyebrow">Chordonomicon + Spotify</p>
+      <h1>Which songs use this chord progression?</h1>
+      <p class="description">Scroll down: learn what chords are, then build a progression and watch the songs that use it appear right below the staff.</p>
+    </header>
 
-    <section class="card">
-      <svg id="staff" width="100%" viewBox="0 0 1040 290"></svg>
-      <button id="undo" type="button">Undo</button> <button id="clear" type="button">Clear</button>
-      <span id="hint" class="hint"></span>
+    <section id="learn" class="step" data-step="1">
+      <h2><span class="num">1</span> What is a chord? What is a chord progression?</h2>
+      <div class="learn-grid">
+        <div class="card learn-card">
+          <h3>A chord is notes played together</h3>
+          <p>Stack three notes that fit together and you get a chord. C, E and G make <b>C major</b>. Lower the middle note by a half step (E → E♭) and it becomes <b>C minor</b>, which sounds sadder.</p>
+          <div class="seg" role="group" aria-label="Major or minor"><button type="button" id="demo-maj" class="on">Major</button><button type="button" id="demo-min">Minor</button></div>
+          <svg id="demo-chord" viewBox="0 0 360 170" role="img" aria-label="A C chord drawn on a staff"></svg>
+          <p id="demo-chord-cap" class="cap"></p>
+        </div>
+        <div class="card learn-card">
+          <h3>A progression is chords in order</h3>
+          <p>Songs move from one chord to the next, usually repeating a short loop. <b>G → D → Em → C</b> is one of the most common, and you will hear it in hundreds of pop and rock songs.</p>
+          <svg id="demo-prog" viewBox="0 0 360 170" role="img" aria-label="Four chords in a row: G major, D major, E minor, C major"></svg>
+          <p class="cap">G, D and C are major chords; Em is E minor.</p>
+        </div>
+      </div>
     </section>
 
+    <section id="build" class="step" data-step="2">
+      <h2><span class="num">2</span> Build your own progression</h2>
+      <p class="description">Click a note on the staff, choose ♭, ♮ or ♯ (and major or minor), and the chord lifts above the staff to join your progression (up to 4, in order). Under each note you will see the chord that most often comes next. The songs update in Step 3, right below.</p>
+    <section class="card">
+      <svg id="staff" width="100%" viewBox="0 0 1040 290"></svg>
+      <button id="undo" type="button">Undo</button> <button id="reset" type="button">Reset</button>
+      <span id="hint" class="hint"></span>
+    </section>
+    </section>
+
+    <section id="explore" class="step step-follow" data-step="3">
+      <h2><span class="num">3</span> See which songs use it</h2>
     <section class="card chart-wrap">
       <div id="summary" class="summary">Loading songs…</div>
       <div class="search">
@@ -43,6 +69,7 @@
         <div id="tooltip" class="tooltip" hidden></div>
       </div>
     </section>
+    </section>
     <p class="foot">
       Data is read straight from <code>Erik/chordonomicon_transformed.csv.gz</code> in the Chords-Explorer folder (decompressed in your browser).
       Seventh, slash, suspended and other extended chords count as their plain major or minor chord; sharps and flats are the same chord (F♯ = G♭); and
@@ -50,5 +77,6 @@
       and colored by main genre; vertical position is random. Songs with no release date or from before 1950 are left out.
     </p>
   </main>
+  <aside id="nudge" class="nudge" hidden><span id="nudge-text"></span> <button type="button" id="nudge-go"></button><button type="button" id="nudge-x" aria-label="Dismiss">×</button></aside>
 </body>
 </html>

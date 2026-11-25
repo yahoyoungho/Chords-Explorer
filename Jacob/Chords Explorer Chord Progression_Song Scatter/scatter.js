@@ -155,7 +155,7 @@ function updateSummary() {
   d3.select("#summary").html(progStr
     ? `<b>${prog.map(ChordStaff.label).join(" → ")}</b> &mdash; ${n.toLocaleString()} songs (${(100 * n / items.length).toFixed(1)}% of ${items.length.toLocaleString()})`
       + (selected !== null ? ` · showing ${counts[selected].toLocaleString()} in <b>${GENRES[selected]}</b>` : "")
-    : "No chords selected. Click chords on the staff to build a progression.");
+    : "No progression yet. Build one in Step 2 and the songs that use it will appear here.");
 }
 window.addEventListener("progchange", e => {
   prog = e.detail.prog;
