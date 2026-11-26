@@ -82,3 +82,18 @@ code { background: #eef2f5; padding: 1px 5px; border-radius: 4px; font-size: .85
 
 /* any text that has to sit over staff lines gets a white outline so the lines never run through the letters */
 .learn-card svg text:not(.clef) { paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
+
+/* popular-song callouts + summary (from young) */
+.summary { font-size: 1.05rem; color: #172a38; min-height: 1.5em; margin-bottom: 10px; }
+.sum { display: flex; flex-direction: column; gap: 8px; }
+.sum-prog { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.sum-chord { display: inline-flex; align-items: center; justify-content: center; min-width: 2.4em; padding: 3px 10px; border-radius: 999px; background: #1d2330; color: #fff; font-weight: 700; font-size: .95rem; }
+.sum-arrow { color: #c2410c; font-weight: 700; }
+.sum-stats { display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 0; }
+.sum-stats div { display: flex; flex-direction: column; gap: 1px; min-width: 7em; }
+.sum-stats dt { margin: 0; font-size: .68rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #547487; }
+.sum-stats dd { margin: 0; font-size: 1.15rem; font-weight: 700; color: #172a38; line-height: 1.2; }
+.sum-note { margin: 0; max-width: 720px; color: #425d6c; font-size: .9rem; line-height: 1.45; }
+#labels text { font-family: Inter, "Segoe UI", Arial, sans-serif; }
+.callout-title { font-size: 12px; font-weight: 700; fill: #172a38; }
+.callout-meta { font-size: 11px; fill: #547487; }

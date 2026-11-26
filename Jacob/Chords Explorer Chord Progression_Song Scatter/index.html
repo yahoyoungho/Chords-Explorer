@@ -65,6 +65,7 @@
       <div id="chart" class="chart">
         <canvas id="dots"></canvas>
         <svg id="axes"></svg>
+        <svg id="labels"></svg>
         <div id="empty" class="empty"></div>
         <div id="tooltip" class="tooltip" hidden></div>
       </div>
@@ -74,7 +75,7 @@
       Data is read straight from <code>Erik/chordonomicon_transformed.csv.gz</code> in the Chords-Explorer folder (decompressed in your browser).
       Seventh, slash, suspended and other extended chords count as their plain major or minor chord; sharps and flats are the same chord (F♯ = G♭); and
       repeated chords in a row count once, so G–D means G followed directly by D. Each dot is one song, placed by release date, sized by Spotify popularity
-      and colored by main genre; vertical position is random. Songs with no release date or from before 1950 are left out.
+      and colored by main genre; vertical position is random. Songs with no release date or from before 1950 are left out. The year axis tightens to the songs on the chart. The most popular song in each genre is outlined and labeled; selecting a genre outlines and labels its top 5.
     </p>
   </main>
   <aside id="nudge" class="nudge" hidden><span id="nudge-text"></span> <button type="button" id="nudge-go"></button><button type="button" id="nudge-x" aria-label="Dismiss">×</button></aside>
