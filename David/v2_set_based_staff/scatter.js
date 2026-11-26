@@ -326,7 +326,7 @@ function updateSummary() {
     d3.select("#summary").text("No chords selected. Build a progression in Step 2.");
     return;
   }
-  const pills = prog.map(c => `<span class="sum-chord">${esc(ChordStaff.label(c))}</span>`).join('<span class="sum-arrow" aria-hidden="true">→</span>');
+  const pills = prog.map(c => `<span class="sum-chord${c.variant ? " is-variant" : ""}">${esc(ChordStaff.display(c))}</span>`).join('<span class="sum-arrow" aria-hidden="true">→</span>');
   const genreN = counts.reduce((a, c) => a + (c > 0 ? 1 : 0), 0);
   let topI = 0;
   counts.forEach((c, i) => { if (c > counts[topI]) topI = i; });

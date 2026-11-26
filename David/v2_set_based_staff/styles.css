@@ -97,3 +97,5 @@ code { background: #eef2f5; padding: 1px 5px; border-radius: 4px; font-size: .85
 #labels text { font-family: Inter, "Segoe UI", Arial, sans-serif; }
 .callout-title { font-size: 12px; font-weight: 700; fill: #172a38; }
 .callout-meta { font-size: 11px; fill: #547487; }
+
+.sum-chord.is-variant { outline: 2px solid #c2410c; }

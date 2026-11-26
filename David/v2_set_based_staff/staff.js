@@ -11,6 +11,8 @@ const ChordStaff = (() => {
   const fullLabel = c => c.letter + (c.acc === "b" ? "♭" : c.acc === "s" ? "♯" : "") + (c.min ? " minor" : " major");
   const label = c => c.letter + (c.acc === "b" ? "♭" : c.acc === "s" ? "♯" : "") + (c.min ? "m" : "");
   const idx = c => c.pc * 2 + (c.min ? 1 : 0);   // 24 chords: pitch class x major/minor (F♯ and G♭ are the same chord)
+ const pretty = t => t.replace(/#/g, "♯").replace(/(^|\/)([A-G])b/g, "$1$2♭");   // "F#min7" -> "F♯min7", "Bbmaj7" -> "B♭maj7"
+  const display = c => c.variant ? pretty(c.variant) : label(c); 
   const yb = 215, half = 10, stepY = s => yb - (s - 2) * half, LANE_Y = 52, laneX = i => 200 + i * 150, MAX = 4;
   let prog = [], laneNodes = [], lane, arrows, nodes, popup, xs, minor = false, openLetter = null, staff;
   const hint = t => d3.select("#hint").text(t);
@@ -86,7 +88,7 @@ const ChordStaff = (() => {
     const g = lane.append("g").attr("class", "lane-note").datum({ c, i }).attr("transform", `translate(${xs(letter) - laneX(i)},${stepY(STEP[letter]) - LANE_Y})`);
     drawNote(g, STEP[letter], a.val, c.min, laneX(i), LANE_Y, false);
     laneNodes.push(g);
-    g.append("text").attr("x", laneX(i)).attr("y", LANE_Y - 26).attr("text-anchor", "middle").attr("font-weight", 700).attr("font-size", 15).text(fullLabel(c));
+    g.append("text").attr("class", "lane-label").attr("x", laneX(i)).attr("y", LANE_Y - 26).attr("text-anchor", "middle").attr("font-weight", 700).attr("font-size", 15).text(fullLabel(c));
     g.transition().duration(650).ease(d3.easeCubicOut).attr("transform", "translate(0,0)");
     emit();
   }
@@ -127,12 +129,13 @@ const ChordStaff = (() => {
     }, 120 + i * 380));
   }
 
-  function setVariant(v) { 
+  function setVariant(v) {
   	if (!prog.length) return;
   	const c = prog[prog.length - 1];
   	if (v) c.variant = v; else delete c.variant;
+  	laneNodes[laneNodes.length - 1].select(".lane-label").text(v ? pretty(v) : fullLabel(c));
   	emit();
   }
 
-  return { init, setNext, setProg, setVariant, label, idx, get prog() { return prog; } };
+  return { init, setNext, setProg, setVariant, label, display, idx, get prog() { return prog; } };
 })();
